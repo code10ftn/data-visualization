@@ -1,0 +1,71 @@
+{% extends "tree_view.html" %}
+
+{% block graph_content %}
+    <script>
+        d3.select('#center_div').append('svg').attr('width', '70vw').attr('height', '75vh');
+
+        var zoom = d3.behavior
+            .zoom()
+            .on('zoom.zoom', function () {
+                console.trace("zoom", d3.event.translate, d3.event.scale);
+                svg.attr('transform',
+                    'translate(' + d3.event.translate + ')'
+                    + 'scale(' + d3.event.scale + ')');
+            });
+
+        var svg = d3
+            .select('svg')
+            .call(zoom).append('g');
+
+        var links = {% autoescape off %}{{ mutable_graph_links }}{% endautoescape %};
+        var persisted_links =
+        {% autoescape off %}{{ persisted_graph_links }}{% endautoescape %}
+        var bird_links = JSON.parse(JSON.stringify(persisted_links))
+    </script>
+
+    <script>
+        {% autoescape off %}{{ graph_script }}{% endautoescape %}
+        var main_force = display_graph(svg, links);
+    </script>
+{% endblock %}
+
+{% block bird_view_content %}
+    <script>
+        var bird_svg = d3.select('#bird_div').append('svg').attr('width', 200).attr('height', 150).append('g');
+        var bird_force = display_graph(bird_svg, bird_links);
+        {% include "bird_view.js" %}
+
+        main_force.on('end', function () {
+            zoomFit(0.95, 500, zoom, svg);
+            main_force.on('end', null);
+        });
+    </script>
+{% endblock %}
+
+{% block operations_content %}
+    <div class="row">
+        <div class="col-lg-6">
+            <form id="filter_data" action="{% url 'filter_data' %}" method="get">
+                <div class="input-group">
+                    <input type="text" id="filter_param" name="filter_param" class="form-control"
+                           placeholder="Filter..." value="{{ request.session.filter_param }}">
+                    <span class="input-group-btn">
+                        <input type="submit" value="Filter" class="btn btn-primary">
+                    </span>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-lg-6">
+            <form id="search_data" action="{% url 'search_data' %}" method="get">
+                <div class="input-group">
+                    <input type="text" id="search_param" name="search_param" class="form-control"
+                           placeholder="Search..." value="{{ request.session.search_param }}">
+                    <span class="input-group-btn">
+                        <input type="submit" value="Search" class="btn btn-primary">
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

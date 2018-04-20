@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block display_data_navigation %}
+    <div>
+        {% if display_plugins and data_loaded %}
+            <div class="btn-group btn-group-justified" role="group" aria-label="...">
+                {% for p in display_plugins.values %}
+                    <a class="btn btn-primary"
+                       href="{% url 'display_data' plugin_id=p.identifier %}">{{ p.name }}</a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h3>No reading plugins installed</h3>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block tree_view_content %}
+    <script>
+        {% include "tree_list.js" %}
+    </script>
+    <script type="application/javascript">
+        var data = {% autoescape off %}{{ json_data }}{% endautoescape %};
+        var id = 0;
+        function tree(data) {
+            var tree = d3.layout.treelist()
+                .childIndent(20)
+                .nodeHeight(30);
+            var ul = d3.select("#tree_div").append("ul").classed("treelist", "true");
+
+            function render(data, parent) {
+                var nodes = tree.nodes(data),
+                    duration = 250;
+
+                function toggleChildren(d) {
+                    if (d.children) {
+                        d._children = d.children;
+                        d.children = null;
+                    } else if (d._children) {
+                        d.children = d._children;
+                        d._children = null;
+                    }
+                }
+
+                var nodeEls = ul.selectAll("li.tree-node").data(nodes, function (d) {
+                    d.id = d.id || ++id;
+                    return d.id;
+                });
+
+                //entered nodes
+                var entered = nodeEls.enter().append("li").classed("tree-node", true)
+                    .style("top", parent.y + "px")
+                    .style("opacity", 0)
+                    .style("height", tree.nodeHeight() + "px")
+                    .on("click", function (d) {
+                        toggleChildren(d);
+                        render(data, d);
+                    })
+                    .on("mouseover", function () {
+                        d3.select(this).classed("selected", true);
+                    })
+                    .on("mouseout", function () {
+                        d3.selectAll(".selected").classed("selected", false);
+                    });
+
+                //add arrows if it is a folder
+                entered.append("span").attr("class", function (d) {
+                    var icon = d.children ? "glyphicon-minus"
+                        : d._children ? "glyphicon-plus" : "";
+                    return "glyphicon " + icon;
+                });
+
+                //add text
+                entered.append("span").attr("class", "filename")
+                    .html(function (d) {
+                        return d.name.length < 20 ? d.name : d.name.substr(0, 20) + "...";
+                    });
+
+                //update caret direction
+                nodeEls.select("span").attr("class", function (d) {
+                    var icon = d.children ? "glyphicon-minus"
+                        : d._children ? "glyphicon-plus" : "";
+                    return "glyphicon " + icon;
+                });
+
+                //update position with transition
+                nodeEls.transition().duration(duration)
+                    .style("top", function (d) {
+                        return (d.y - tree.nodeHeight()) + "px";
+                    })
+                    .style("left", function (d) {
+                        return d.x + "px";
+                    })
+                    .style("opacity", 1);
+                nodeEls.exit().remove();
+            }
+
+            render(data, data);
+        }
+        tree(data);
+    </script>
+{% endblock %}

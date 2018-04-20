@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block head_content %}
+    {% load staticfiles %}
+    <script>
+        window.onload = raiseError("{{ request.session.error }}");
+    </script>
+{% endblock %}

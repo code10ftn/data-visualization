@@ -1,0 +1,93 @@
+/* Base */
+.input-control {
+    position: relative;
+    height: 40px;
+    width: 400px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.main-content {
+    margin-top: 55px;
+}
+
+.container-full {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.force-relative {
+    position: relative;
+}
+
+.force-relative #bird_div {
+    position: absolute;
+    top: 65%;
+    right: 0;
+    background-color: white;
+    border: 1px solid #000;
+}
+
+/* Tree */
+.tree-view {
+    position: relative;
+    overflow-y: scroll;
+    overflow-x: auto;
+    height: 90vh;
+}
+
+.selected {
+    color: orange;
+}
+
+.tree-node {
+    position: absolute;
+    list-style: none;
+    cursor: default;
+}
+
+.tree-node span {
+    margin-right: 3px;
+}
+
+.tree-node .caret {
+    font-size: 10px;
+}
+
+/* Graph */
+.node {
+    fill: #ccc;
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+.link {
+    stroke: #777;
+    stroke-width: 2px;
+}
+
+.arrow {
+    fill: #777;
+    stroke-width: 0.5px;
+}
+
+.black {
+    fill: rgb(41, 41, 41);
+    stroke: rgb(41, 41, 41);
+    stroke-width: 1px;
+    font-size: 8px;
+    font-family: 'Courier New';
+}
+
+.blackSmall {
+    fill: rgb(41, 41, 41);
+    stroke: rgb(41, 41, 41);
+    stroke-width: 0.1px;
+    font-size: 2px;
+    font-family: 'Courier New';
+}
